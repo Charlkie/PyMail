@@ -15,7 +15,7 @@ def main():
 	messages = Gmail.GetMessages().list(msgTotal)
 
 	# example2
-	messages2 = Gmail.GetMessages().list(msgTotal, ["INBOX"] ,'subject:("Welcome")')
+	messages2 = Gmail.GetMessages().list(msgTotal, ["INBOX"] ,'subject:("Welcome")')   # Supports the same query format as the Gmail search box.
 
 	# example3   (only 5 messages)
 	messages3 = Gmail.GetMessages().list(5, ["INBOX"] ,)
@@ -24,18 +24,19 @@ def main():
 	####################       # in most cases you won't need to modify this block
 	# Gets message data
 	messageData = Gmail.getMessageData(messages, log=True)
-	# Get payload of message data
-	payloads = Gmail.getPayload(messageData, log=True)
-	# Unpack payload
-	messageBodies = Gmail.unpackPayload(payloads, log=True)
-	####################
-	
+	if messageData is not None  # check if we have any messages
+		# Get payload of message data
+		payloads = Gmail.getPayload(messageData, log=True)
+		# Unpack payload
+		messageBodies = Gmail.unpackPayload(payloads, log=True)
+		####################
 
-	for msg in messageBodies:  		 # printing messages bodies
-		if 'html' in msg:        		 # simple check if it is html or text
-			print(msg['html'])
-		else:
-			print(msg['plain'])
+
+		for msg in messageBodies:  		 # printing messages bodies
+			if 'html' in msg:        		 # simple check if it is html or text
+				print(msg['html'])
+			else:
+				print(msg['plain'])
 
 
 
