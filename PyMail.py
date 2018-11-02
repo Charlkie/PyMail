@@ -40,16 +40,19 @@ class Gmail:
 			messages (list): The returned object from the
 			`getMessages` function
 		"""
-		messages = [
-			self.service.users().messages().get(userId=self.user_id,
-												id=message['id'],
-												format=format).execute()
-			for message in messages['messages']
-		]
-		if log:
-			debug.writeLog(format+' message' if format else 'messages',
-							messages)
-		return messages
+		if 'messages' in messages: # check if we have any messages, else return None
+			messages = [
+				self.service.users().messages().get(userId=self.user_id,
+													id=message['id'],
+													format=format).execute()
+				for message in messages['messages']
+			]
+			if log:
+				debug.writeLog(format+' message' if format else 'messages',
+								messages)
+			return messages
+		else:
+			return None
 
 	def getPayload(self, messages, log=False):
 		""" Returns a list of payload data from message data
