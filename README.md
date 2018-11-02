@@ -3,6 +3,15 @@
 [![License](https://img.shields.io/badge/License-MIT-orange.svg)](https://github.com/Charlkie/PyMail/blob/master/LICENSE)
 ![](https://img.shields.io/badge/Version-Beta%200.1.0-brightgreen.svg)
 
+**If you need only gmail api library**
+
+Simple example of use is in file `gmailApi-example.py`
+
+You can remove folders SPA and Server
+
+This is most complete gmail api python library on github
+
+------------
 
 **Future Plans:**
 
