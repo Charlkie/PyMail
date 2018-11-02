@@ -60,10 +60,13 @@ class Gmail:
 			messages (list): The returned object from the
 			`getMessageData` function
 		"""
-		payloads = [ message['payload'] for message in messages ]
-		if log:
-			debug.writeLog('payload', payloads)
-		return payloads
+		if messages is  None:
+			return None
+		else:
+			payloads = [ message['payload'] for message in messages ]
+			if log:
+				debug.writeLog('payload', payloads)
+			return payloads
 
 	def decodeMSG(self, message):
 		""" Decodes `message` paramater into utf-8
@@ -99,74 +102,77 @@ class Gmail:
 			x (int): Specifies the index of the payloads
 			depth (int): Specifies the Depth of recursion
 		"""
-		messageParts = []
-		plain = False
-		plainText = ''
-		for msg in payloads:
-			parts = {}
-			if bodies:
-				type = msg['mimeType']
-				# Plain text
-				if type == 'text/plain' and 'plain' in types:
-					plainText = self.decodeMSG(msg['body']['data'])
-					if depth == 0:
-						parts['plain'] = plainText[:20]
-					else:
-						plain = True
-				# Html
-				elif type == 'text/html' and 'html' in types:
-					plain = False
-					body = self.decodeMSG(msg['body']['data'])
-					if depth > 0:
-						return { "html": body }
-					parts['html'] = body
-				# Other
-				elif type[10:] in ['mixed', 'alternative',
-									'related', 'report']:
-					msgParts = msg['parts']
-					parts = self.unpackPayload(msgParts, bodies=True,
-										types=types, x=x, depth=depth+1)
-					if depth > 0:
-						return parts
-				# Attatchment
-				elif type[:10] == 'application':
-					pass
-			# Headers
-			if depth == 0:
-				#print(parts, 'X:', x)
-				header = msg['headers']
-				for head in header:
-					name, value = head['name'], head['value']
-					if name == 'Date':
-						parts['dateTime'] = value
-					if name == 'Subject':
-						parts['Subject'] = value
-					if name == 'From':
-						if '<' in value:
-							FROM, EMAIL = value.split('<')
-							parts['From'] = FROM[:-1]
-							parts['From-email'] = EMAIL[:-1]
-						else:
-							parts['From-email'] = value
-			messageParts.append(parts)
-			x += 1
-		if plain and depth > 0:
+		if payloads is  None:
+			return None
+		else:
+			messageParts = []
 			plain = False
-			return { "plain": plainText[:20] }
-		# adds plain message if no html
-		if log:
-			debug.createLog(dir='logs/bodies')
-			debug.writeLog("mockData" if bodies else "headers",
-							messageParts)
-			if bodies:
-				for (index, msg) in enumerate(messageParts):
-					if 'html' in msg:
-						debug.writeLog(str(index+1), msg['html'],
-										'bodies/', extension="html")
-					else:
-						debug.writeLog(str(index+1), msg['plain'],
-										'bodies/', extension="txt")
-		return messageParts
+			plainText = ''
+			for msg in payloads:
+				parts = {}
+				if bodies:
+					type = msg['mimeType']
+					# Plain text
+					if type == 'text/plain' and 'plain' in types:
+						plainText = self.decodeMSG(msg['body']['data'])
+						if depth == 0:
+							parts['plain'] = plainText[:20]
+						else:
+							plain = True
+					# Html
+					elif type == 'text/html' and 'html' in types:
+						plain = False
+						body = self.decodeMSG(msg['body']['data'])
+						if depth > 0:
+							return { "html": body }
+						parts['html'] = body
+					# Other
+					elif type[10:] in ['mixed', 'alternative',
+										'related', 'report']:
+						msgParts = msg['parts']
+						parts = self.unpackPayload(msgParts, bodies=True,
+											types=types, x=x, depth=depth+1)
+						if depth > 0:
+							return parts
+					# Attatchment
+					elif type[:10] == 'application':
+						pass
+				# Headers
+				if depth == 0:
+					#print(parts, 'X:', x)
+					header = msg['headers']
+					for head in header:
+						name, value = head['name'], head['value']
+						if name == 'Date':
+							parts['dateTime'] = value
+						if name == 'Subject':
+							parts['Subject'] = value
+						if name == 'From':
+							if '<' in value:
+								FROM, EMAIL = value.split('<')
+								parts['From'] = FROM[:-1]
+								parts['From-email'] = EMAIL[:-1]
+							else:
+								parts['From-email'] = value
+				messageParts.append(parts)
+				x += 1
+			if plain and depth > 0:
+				plain = False
+				return { "plain": plainText[:20] }
+			# adds plain message if no html
+			if log:
+				debug.createLog(dir='logs/bodies')
+				debug.writeLog("mockData" if bodies else "headers",
+								messageParts)
+				if bodies:
+					for (index, msg) in enumerate(messageParts):
+						if 'html' in msg:
+							debug.writeLog(str(index+1), msg['html'],
+											'bodies/', extension="html")
+						else:
+							debug.writeLog(str(index+1), msg['plain'],
+											'bodies/', extension="txt")
+			return messageParts
 
 	def getUserInfo(self):
 		return self.service.users().labels().get(userId=self.user_id,
