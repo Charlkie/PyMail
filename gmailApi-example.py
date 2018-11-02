@@ -24,13 +24,13 @@ def main():
 	####################       # in most cases you won't need to modify this block
 	# Gets message data
 	messageData = Gmail.getMessageData(messages, log=True)
-	if messageData is not None  # check if we have any messages
-		# Get payload of message data
-		payloads = Gmail.getPayload(messageData, log=True)
-		# Unpack payload
-		messageBodies = Gmail.unpackPayload(payloads, log=True)
-		####################
-
+	# Get payload of message data
+	payloads = Gmail.getPayload(messageData, log=True)
+	# Unpack payload
+	messageBodies = Gmail.unpackPayload(payloads, log=True)
+	####################
+	
+	if messageBodies is not None  # check if we have any messages
 
 		for msg in messageBodies:  		 # printing messages bodies
 			if 'html' in msg:        		 # simple check if it is html or text
