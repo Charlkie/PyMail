@@ -174,16 +174,16 @@ class Gmail:
 		def __init__(self):
 			self.service = auth()
 
-		def list(self, maxResults=1, labelIds=["INBOX"]):
+		def list(self, maxResults=1, labelIds=["INBOX"], query=''):
 			"""
 			Returns a list of messages and thread Id's for n number
 			of messages
 			"""
 			msgList = self.service.users().messages().list(userId='me',
-					labelIds=labelIds, maxResults=maxResults).execute()
+					labelIds=labelIds, q=query, maxResults=maxResults).execute()
 			return msgList
 
-		def query(self, results=1, query=''):
+		def query(self, results=1, query=''):  # deprecated, use .list instead
 			"""
 			Returns a list of messages and thread Id's for n number
 			of messages that meet a specific query
