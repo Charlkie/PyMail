@@ -37,7 +37,7 @@ This module is a python implementation of Google's Gmail API. It takes the key p
 ## PyMail Documentation
 
 To test all PyMail methods run:
-`$ python3 mail_test.py`
+`$ python3 test_mail.py`
 
 ### Methods
 
